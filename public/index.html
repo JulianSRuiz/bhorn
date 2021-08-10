@@ -1,0 +1,60 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" 
+        rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" 
+        crossorigin="anonymous">
+    <script src="js/index.js"></script>
+</head>
+
+<body>
+    <main id="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-3 col-lg-3 xs-hidden sidebar">
+                    <p style="padding: 0 20px;"><strong>Filter by department:</strong></p>
+                    <select class="jobs-teams">
+                      <option value="" disabled selected>Department</option>
+                    </select>
+                    <!-- <div class="dropdown">
+                      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        Department
+                      </a>
+                      <ul class="jobs-teams dropdown-menu" aria-labelledby="dropdownMenuLink">
+                      </ul>
+                    </div> -->
+                    <p style="padding: 0 20px;"><strong>Filter by location:</strong></p>
+                    <select class="jobs-locations">
+                      <option value="" disabled selected>Location</option>
+                    </select>
+                </div>
+                <div class="col-md-9 col-md-9">
+                    <section>
+                        <div id="jobs-container">
+                            <div class="titleSearchRow row">
+                              <div class="col-md-6">
+                                <h2 style="margin: 0 30px;">Open jobs</h2>
+                                <div class="totalJobs" style="margin: 0 30px;"></div>
+                              </div>
+                              <div class="col-md-6" style="text-align: end;">
+                                <input style="margin: 0 10px 30px 30px;" type="text" id="filterInput"
+                                    placeholder="Search jobs by title">
+                              </div>
+                            </div>
+                            <div class="jobs-list">
+                                <ul id="jobs" class="list-group">
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>
