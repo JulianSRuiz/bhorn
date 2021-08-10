@@ -48,6 +48,11 @@ select.lever-jobs-filter-team {
   max-width: 285px;
 }
 
+
+html body main#content div.container-fluid div.row div select {
+  max-width: 200px;
+}
+
 ul#jobs {
   padding: 0;
 }
