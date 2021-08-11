@@ -76,6 +76,8 @@ let usStates = {
     "Wisconsin": true,
     "Wyoming": {}
 }
+
+let usStateLocationByIdMapping = {}
 // TODO: change the format of location filter to be city, country
 
 $(document).ready(async () => {
@@ -108,16 +110,18 @@ $(document).ready(async () => {
             let { department, location } = posting.categories
             const postingId = posting.id
 
+            const oldLoc = location
             location = location.split(/\s?,\s?/)
 
             if (location[1] in usStates) {
                 location[1] = "United States"
             }
 
-           location = location.join(", ")
-            console.log(location)
-            // Mapping of all of the posts by id
+            location = location.join(", ")
 
+            usStateLocationByIdMapping[postingId] = location
+
+            // Mapping of all of the posts by id
             acc.posts[postingId] = posting
 
             // Mapping of all of the posts for a department
@@ -157,7 +161,6 @@ function activateButtonsFromPostings(selector, selectedJobsList, postings) {
     $(`select${selector}`).change(event => {
         event.preventDefault()
 
-
         let key = event.target.value
 
         filterState[selectedJobsList] = key
@@ -167,64 +170,66 @@ function activateButtonsFromPostings(selector, selectedJobsList, postings) {
 }
 
 const updateHTMLAfterFilterState = (() => {
-    let count = 0
-
     return (postings) => {
 
         var jobs = $(".jobs-list")
 
-
-        let posts = Object.keys(postings.posts).filter((id) => {
+        let posts = Object.keys(postings.posts).map((id) => {
             let post = postings.posts[id]
 
-            let locationCase = post.categories.location === filterState.location
+            // Find the mapping of the City, State that converted to City, Country this id done by looking up its id
+            let locationCase = usStateLocationByIdMapping[id] === filterState.location
             let departmentCase = post.categories.department === filterState.department
-
             let searchCase = post.text.toLowerCase().includes(filterState.search.toLowerCase())
 
+            // TODO: add a case to add back everything on the drop downs
+
+            // Filter by inclusion all or none need to match
+
             if (filterState.search && filterState.location && filterState.department) {
-                return searchCase && locationCase && departmentCase
+                let keep = searchCase && locationCase && departmentCase
+                return { id, keep }
             }
             if (filterState.search && filterState.location) {
-                return searchCase && locationCase
+                let keep = searchCase && locationCase
+                return { id, keep }
             }
             if (filterState.department && filterState.location) {
-                return locationCase && departmentCase
+                let keep = locationCase && departmentCase
+                return { id, keep }
             }
             if (filterState.search && filterState.location) {
-                return searchCase && locationCase
+                let keep = searchCase && locationCase
+                return { id, keep }
             }
             if (filterState.search && filterState.department) {
-                return searchCase && departmentCase
+                let keep = searchCase && departmentCase
+                return { id, keep }
             }
             if (filterState.location) {
-                return locationCase
+                let keep = locationCase
+                return { id, keep }
             }
             if (filterState.department) {
-                return departmentCase
+                let keep = departmentCase
+                return { id, keep }
             }
             if (filterState.search) {
-                console.log(departmentCase)
-                return searchCase
+                let keep = searchCase
+                return { id, keep }
             }
 
-
-            return false
         })
 
-        if (count !== posts.length) {
-            jobs
-                .find(".job")
-                .fadeOut("fast")
-        }
+        $("#numOfPosts").text(posts.filter(({ keep }) => keep).length)
 
-        console.log(count, posts.length)
-        count = posts.length
-
-        $("#numOfPosts").text(posts.length)
-
-        for (let id of posts) {
-            jobs.find(`.${id}`).fadeIn("fast")
+        for (let obj of posts) {
+            let { id, keep } = obj
+            if (keep) {
+                jobs.find(`.${id}`).fadeIn("fast")
+            } else {
+                jobs.find(`.${id}`).fadeOut("fast")
+            }
         }
     }
 })()
@@ -261,6 +266,7 @@ function nullCheck(string) {
 
 function createJobsFromPostings(postings) {
 
+    // Create Options for departments
     for (var department in postings.departments) {
 
         var cleanStr = cleanString(nullCheck(department))
@@ -275,6 +281,7 @@ function createJobsFromPostings(postings) {
         $(".jobs-teams").append(teamButton)
     }
 
+    // Create Options for locations
     for (var location in postings.locations) {
 
         var cleanStr = cleanString(nullCheck(location))
@@ -287,7 +294,7 @@ function createJobsFromPostings(postings) {
         $(".jobs-locations").append(teamButton)
     }
 
-
+    // Create Listings of the Posts
     for (var id in postings.posts) {
 
         var posting = postings.posts[id]
@@ -340,8 +347,6 @@ function createJobsFromPostings(postings) {
                 </ul>
             </li>
             
-            
-            
             <div class="modal fade" id="${id}" role="dialog">
               <div class="modal-dialog">
                   <div class="modal-content" style="min-width: 95vw !important;">
@@ -390,15 +395,17 @@ function createJobsFromPostings(postings) {
 
     }
 
-    //Count the total amount of jobs
+    // Count the total amount of jobs
     $(".totalJobs").append('<span><p id="numOfPosts">' + Object.keys(postings.posts).length + " jobs</p></span>")
 }
 
 
 
-const filterNames = (postings) => (event) => {
-    // Get value of input
-
-    filterState.search = event.target.value
-    updateHTMLAfterFilterState(postings)
+const filterNames = (postings) => {
+    return (event) => {
+        // Get value of input
+        filterState.search = event.target.value
+        var str = event.target.value
+        updateHTMLAfterFilterState(postings)
+    }
 }
